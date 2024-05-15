@@ -15,7 +15,7 @@ class Database {
   }
 
   connect() {
-    if (1 === 1) {
+    if ((process.env.NODE_ENV = 'development')) {
       mongoose.set('debug', true);
       mongoose.set('debug', { color: true });
     }
