@@ -2,7 +2,7 @@ const express = require('express');
 const { checkAuth, checkPermission } = require('../auth/checkAuth');
 const router = express.Router();
 
-const SIMPLE = '0001';
+const SIMPLE = '0000';
 
 // middleware
 router.use(checkAuth);
