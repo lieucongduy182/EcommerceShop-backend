@@ -9,11 +9,13 @@ const {
 } = require('../cores/error.response');
 const KeyTokenService = require('../services/keyToken.service');
 const { asyncHandler } = require('../helpers/asyncHandler');
+const TokenValidator = require('../validator/token');
 
 const HEADER = {
   API_KEY: 'x-api-key',
   CLIENT_ID: 'x-client-id',
   AUTHORIZATION: 'authorization',
+  REFRESH_TOKEN: 'x-rtoken-id',
 };
 
 const createTokenPair = async ({ payload, publicKey, privateKey }) => {
@@ -60,8 +62,7 @@ const generateKeyPairSync = () => {
 
 const authentication = asyncHandler(async (req, res, next) => {
   const userId = req.headers[HEADER.CLIENT_ID];
-  const accessToken = req.headers[HEADER.AUTHORIZATION]?.split(' ')[1];
-  if (!userId || !accessToken) {
+  if (!userId) {
     throw new AuthFailureError('Invalid Request');
   }
 
@@ -71,26 +72,31 @@ const authentication = asyncHandler(async (req, res, next) => {
   }
 
   try {
-    const decoded = JWT.verify(accessToken, keyStore.publicKey);
-    console.log('decoded:::', decoded);
-    if (userId !== decoded.userId) {
+    const accessToken = req.headers[HEADER.AUTHORIZATION]?.split(' ')[1];
+    const refreshToken = req.headers[HEADER.REFRESH_TOKEN];
+    if (!refreshToken || !accessToken) {
       throw new AuthFailureError('Invalid Request');
     }
 
-    req.keyStore = keyStore;
+    const validator = new TokenValidator(keyStore);
+    const activeToken = refreshToken || accessToken;
+    const decodedUser = validator.verifyJWT(activeToken);
+    validator.verifyUserId({ decodedUser, requestUserId: userId });
+
+    Object.assign(req, {
+      keyStore,
+      user: decodedUser,
+      refreshToken: activeToken,
+    });
+
     next();
   } catch (error) {
     throw new InternalServerError();
   }
 });
 
-const verifyJWT = ({ token, key }) => {
-  return JWT.verify(token, key);
-};
-
 module.exports = {
   createTokenPair,
   generateKeyPairSync,
   authentication,
-  verifyJWT,
 };

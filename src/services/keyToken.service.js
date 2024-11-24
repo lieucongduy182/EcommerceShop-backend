@@ -30,7 +30,7 @@ class KeyTokenService {
   }
 
   static findByUserId(userId) {
-    return keyTokenModel.findOne({ user: new Types.ObjectId(userId) }).lean();
+    return keyTokenModel.findOne({ user: new Types.ObjectId(userId) });
   }
 
   static removeKeyById(id) {
