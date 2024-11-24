@@ -1,11 +1,19 @@
 'use strict';
 const shopModel = require('../models/shops.model');
 const bcrypt = require('bcrypt');
-const crypto = require('crypto');
 const KeyTokenService = require('./keyToken.service');
-const { createTokenPair } = require('../auth/authUtil');
+const ShopService = require('./shop.service');
+const {
+  createTokenPair,
+  generateKeyPairSync,
+  verifyJWT,
+} = require('../auth/authUtil');
 const utils = require('../utils');
-const { BadRequestError } = require('../cores/error.response');
+const {
+  BadRequestError,
+  AuthFailureError,
+  ForbiddenError,
+} = require('../cores/error.response');
 
 const ROLE_SHOPS = {
   ADMIN: '001',
@@ -32,27 +40,7 @@ class AccessService {
 
     if (newShop) {
       // create private key and public key
-      const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
-        modulusLength: 4096,
-        publicKeyEncoding: {
-          type: 'pkcs1',
-          format: 'pem',
-        },
-        privateKeyEncoding: {
-          type: 'pkcs1',
-          format: 'pem',
-        },
-      });
-
-      const keyStore = await KeyTokenService.createKeyToken({
-        userId: newShop._id,
-        publicKey,
-        privateKey,
-      });
-
-      if (!keyStore) {
-        throw new BadRequestError('Error: Create public key');
-      }
+      const { publicKey, privateKey } = generateKeyPairSync();
 
       // create Token pair
       const payload = {
@@ -60,14 +48,23 @@ class AccessService {
         name: newShop.name,
         email: newShop.email,
       };
-      const { publicKey: publicKeyString } = keyStore;
       const tokens = await createTokenPair({
         payload,
-        publicKey: publicKeyString,
+        publicKey: publicKey.toString(),
         privateKey,
       });
 
       if (tokens) {
+        const keyStore = await KeyTokenService.createKeyToken({
+          userId: newShop._id,
+          publicKey,
+          privateKey,
+          refreshToken: tokens.refreshToken,
+        });
+
+        if (!keyStore) {
+          throw new BadRequestError('Error: Create public key');
+        }
         return {
           status: 201,
           metadata: {
@@ -84,6 +81,111 @@ class AccessService {
     return {
       code: 400,
       metadata: null,
+    };
+  }
+
+  static async login({ email, password, refreshToken = null }) {
+    const foundShop = await ShopService.findByEmail({ email });
+    if (!foundShop) throw new BadRequestError('Shop not registered!');
+
+    const isMatchPassword = await bcrypt.compare(password, foundShop.password);
+    if (!isMatchPassword) throw new AuthFailureError('Wrong password!');
+
+    const userId = foundShop._id;
+    const payload = {
+      userId,
+      email,
+    };
+    const { publicKey, privateKey } = generateKeyPairSync();
+    const tokens = await createTokenPair({
+      payload,
+      publicKey,
+      privateKey,
+    });
+    // save RT, Public Key, Private Key
+    if (tokens?.refreshToken) {
+      await KeyTokenService.createKeyToken({
+        userId,
+        publicKey,
+        privateKey,
+        refreshToken: tokens.refreshToken,
+      });
+    }
+
+    return {
+      shop: utils.getInfoData({
+        fields: ['_id', 'name', 'email'],
+        object: foundShop,
+      }),
+      tokens,
+    };
+  }
+
+  static async logout({ keyStore }) {
+    return KeyTokenService.removeKeyById(keyStore._id);
+  }
+
+  static async handleRefreshToken({ refreshToken }) {
+    const foundToken = await KeyTokenService.findByRefreshTokenUsed(
+      refreshToken
+    );
+    // if exist, detect who user?
+    if (foundToken) {
+      const { userId, email } = verifyJWT({
+        token: refreshToken,
+        key: foundToken.privateKey,
+      });
+      await KeyTokenService.removeByUserId(userId);
+      throw new ForbiddenError(
+        'Something went wrong! Please try again to login in!'
+      );
+    }
+
+    // allow to verify token
+    const holderToken = await KeyTokenService.findByRefreshToken(refreshToken);
+    if (!holderToken) {
+      throw new AuthFailureError('Shop not registered');
+    }
+
+    const { userId, email } = verifyJWT({
+      token: refreshToken,
+      key: holderToken.privateKey,
+    });
+    console.table([
+      {
+        email,
+        userId,
+      },
+    ]);
+
+    const foundShop = await ShopService.findByEmail({ email });
+    if (!foundShop) {
+      throw new AuthFailureError('Shop not registered');
+    }
+
+    // create token pair
+    const tokens = await createTokenPair({
+      payload: { userId, email },
+      publicKey: holderToken.publicKey,
+      privateKey: holderToken.privateKey,
+    });
+
+    // update new tokens
+    await holderToken.updateOne({
+      $set: {
+        refreshToken: tokens.refreshToken,
+      },
+      $addToSet: {
+        refreshTokenUsed: refreshToken, // used to retrieve new token
+      },
+    });
+
+    return {
+      tokens,
+      shop: utils.getInfoData({
+        fields: ['_id', 'name', 'email'],
+        object: foundShop,
+      }),
     };
   }
 }
