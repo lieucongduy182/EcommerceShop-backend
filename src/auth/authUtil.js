@@ -74,7 +74,7 @@ const authentication = asyncHandler(async (req, res, next) => {
   try {
     const accessToken = req.headers[HEADER.AUTHORIZATION]?.split(' ')[1];
     const refreshToken = req.headers[HEADER.REFRESH_TOKEN];
-    if (!refreshToken || !accessToken) {
+    if (!refreshToken && !accessToken) {
       throw new AuthFailureError('Invalid Request');
     }
 
