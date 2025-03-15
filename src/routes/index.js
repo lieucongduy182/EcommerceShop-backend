@@ -8,7 +8,7 @@ const SIMPLE = '0000';
 router.use(checkAuth);
 router.use(checkPermission(SIMPLE));
 
-router.use('/api/v1', require('./access'));
 router.use('/api/v1/product', require('./product'));
+router.use('/api/v1', require('./access'));
 
 module.exports = router;

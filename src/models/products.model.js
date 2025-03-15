@@ -81,4 +81,6 @@ productSchema.pre('save', function (next) {
   next();
 });
 
+productSchema.index({ name: 'text', description: 'text' });
+
 module.exports = mongoose.model(DOCUMENT_NAME, productSchema);
