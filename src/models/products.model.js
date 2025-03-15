@@ -17,6 +17,9 @@ const productSchema = new Schema(
     description: {
       type: String,
     },
+    slug: {
+      type: String,
+    },
     price: {
       type: Number,
       required: true,
@@ -42,11 +45,34 @@ const productSchema = new Schema(
       type: Schema.Types.Mixed,
       required: true,
     },
+    ratings: {
+      type: Number,
+      min: [1, 'Rating must be at least 1'],
+      max: [5, 'Rating must be at most 5'],
+      default: 4.5,
+      set: (val) => Math.round(val * 10) / 10,
+    },
+    variations: {
+      type: Array,
+      default: [],
+    },
+    isDraft: {
+      type: Boolean,
+      default: true,
+      index: true,
+      select: false,
+    },
+    isPublish: {
+      type: Boolean,
+      default: false,
+      index: true,
+      select: false,
+    },
   },
   {
     timestamps: true,
     collection: COLLECTION_NAME,
-  }
+  },
 );
 
 module.exports = mongoose.model(DOCUMENT_NAME, productSchema);

@@ -1,4 +1,4 @@
-const BaseProduct = require('../base/base.service');
+const BaseProduct = require('../base/base');
 const ElectronicModel = require('../../../models/electronics.model');
 
 class Electronics extends BaseProduct {
