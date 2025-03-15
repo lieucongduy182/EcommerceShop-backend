@@ -1,7 +1,9 @@
 const { BadRequestError } = require('../../cores/error.response');
-const ProductModel = require('../../models/products.model');
-const ClothingModel = require('../../models/clothes.model');
-const ElectronicModel = require('../../models/electronics.model');
+const {
+  ProductModel,
+  ClothingModel,
+  ElectronicModel,
+} = require('../../models');
 
 const ProductType = {
   CLOTHING: 'clothing',

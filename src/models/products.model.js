@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 const { Schema } = mongoose;
 
 const COLLECTION_NAME = 'Products';
@@ -62,7 +63,7 @@ const productSchema = new Schema(
       index: true,
       select: false,
     },
-    isPublish: {
+    isPublished: {
       type: Boolean,
       default: false,
       index: true,
@@ -74,5 +75,10 @@ const productSchema = new Schema(
     collection: COLLECTION_NAME,
   },
 );
+
+productSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
 
 module.exports = mongoose.model(DOCUMENT_NAME, productSchema);

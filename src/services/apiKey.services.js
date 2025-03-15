@@ -1,8 +1,8 @@
-const apiKeyModel = require('../models/apiKey.model');
+const { ApiKeyModel } = require('../models');
 
 class ApiKeyService {
   static findApiKeyById({ key }) {
-    return apiKeyModel.findOne({ key }).lean();
+    return ApiKeyModel.findOne({ key }).lean();
   }
 }
 

@@ -1,5 +1,5 @@
 'use strict';
-const shopModel = require('../models/shops.model');
+const { ShopModel } = require('../models');
 const bcrypt = require('bcrypt');
 const KeyTokenService = require('./keyToken.service');
 const ShopService = require('./shop.service');
@@ -20,14 +20,13 @@ const ROLE_SHOPS = {
 
 class AccessService {
   static async signUp({ name, email, password }) {
-    // check email if exist
-    const holderShop = await shopModel.findOne({ email }).lean();
+    const holderShop = await ShopModel.findOne({ email }).lean();
     if (holderShop) {
       throw new BadRequestError('Error: Shop already registered');
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const newShop = await shopModel.create({
+    const newShop = await ShopModel.create({
       name,
       email,
       password: passwordHash,
@@ -126,7 +125,7 @@ class AccessService {
     if (keyStore.refreshTokenUsed.includes(refreshToken)) {
       await KeyTokenService.removeByUserId(userId);
       throw new ForbiddenError(
-        'Something went wrong! Please try again to login in!'
+        'Something went wrong! Please try again to login in!',
       );
     }
 

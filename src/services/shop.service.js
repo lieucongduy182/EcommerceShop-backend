@@ -1,6 +1,6 @@
 'use strict';
 
-const shopModel = require('../models/shops.model');
+const { ShopModel } = require('../models');
 
 class ShopService {
   static findByEmail({
@@ -12,11 +12,11 @@ class ShopService {
       role: 1,
     },
   }) {
-    return shopModel.findOne({ email }).select(select).lean();
+    return ShopModel.findOne({ email }).select(select).lean();
   }
 
   static findByEmailAndPassword({ email, password }) {
-    return shopModel.findOne({ email, password }).lean();
+    return ShopModel.findOne({ email, password }).lean();
   }
 }
 

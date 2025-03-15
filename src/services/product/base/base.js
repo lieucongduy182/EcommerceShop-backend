@@ -1,5 +1,5 @@
 const { BadRequestError } = require('../../../cores/error.response');
-const ProductModel = require('../../../models/products.model');
+const { ProductModel } = require('../../../models');
 
 class Product {
   constructor({

@@ -1,6 +1,6 @@
-const Clothing = require('../clothing/clothing.service');
-const Electronics = require('../electronics/electronic.service');
-const Furniture = require('../furniture/furniture.service');
+const ClothingService = require('../clothing/clothing.service');
+const ElectronicsService = require('../electronics/electronic.service');
+const FurnitureService = require('../furniture/furniture.service');
 
 const ProductType = {
   CLOTHING: 'clothing',
@@ -9,9 +9,9 @@ const ProductType = {
 };
 
 const ProductTypeMap = {
-  [ProductType.CLOTHING]: Clothing,
-  [ProductType.ELECTRONICS]: Electronics,
-  [ProductType.FURNITURE]: Furniture,
+  [ProductType.CLOTHING]: ClothingService,
+  [ProductType.ELECTRONICS]: ElectronicsService,
+  [ProductType.FURNITURE]: FurnitureService,
 };
 
 module.exports = {

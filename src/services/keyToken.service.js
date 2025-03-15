@@ -1,4 +1,4 @@
-const keyTokenModel = require('../models/keytoken.model');
+const { KeyTokenModel } = require('../models');
 const { BadRequestError } = require('../cores/error.response');
 const { Types } = require('mongoose');
 
@@ -13,10 +13,10 @@ class KeyTokenService {
         refreshToken,
       };
       const options = { upsert: true, new: true };
-      const tokens = await keyTokenModel.findOneAndUpdate(
+      const tokens = await KeyTokenModel.findOneAndUpdate(
         filter,
         updateData,
-        options
+        options,
       );
 
       if (!tokens) {
@@ -30,25 +30,25 @@ class KeyTokenService {
   }
 
   static findByUserId(userId) {
-    return keyTokenModel.findOne({ user: new Types.ObjectId(userId) });
+    return KeyTokenModel.findOne({ user: new Types.ObjectId(userId) });
   }
 
   static removeKeyById(id) {
-    return keyTokenModel.deleteOne({ _id: new Types.ObjectId(id) });
+    return KeyTokenModel.deleteOne({ _id: new Types.ObjectId(id) });
   }
 
   static removeByUserId(userId) {
-    return keyTokenModel.findOneAndDelete({
+    return KeyTokenModel.findOneAndDelete({
       user: new Types.ObjectId(userId),
     });
   }
 
   static findByRefreshTokenUsed(refreshToken) {
-    return keyTokenModel.findOne({ refreshTokenUsed: refreshToken }).lean();
+    return KeyTokenModel.findOne({ refreshTokenUsed: refreshToken }).lean();
   }
 
   static findByRefreshToken(refreshToken) {
-    return keyTokenModel.findOne({ refreshToken });
+    return KeyTokenModel.findOne({ refreshToken });
   }
 }
 

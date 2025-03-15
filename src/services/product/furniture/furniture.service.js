@@ -1,5 +1,5 @@
 const BaseProduct = require('../base/base');
-const FurnitureModel = require('../../../models/furniture.model');
+const { FurnitureModel } = require('../../../models');
 
 class Furniture extends BaseProduct {
   async create() {
