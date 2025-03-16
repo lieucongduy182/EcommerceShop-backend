@@ -12,6 +12,24 @@ class Clothing extends BaseProduct {
       productId: newClothing._id,
     });
   }
+
+  async updateProduct({ productId }) {
+    if (!productId) {
+      throw new BadRequestError('Invalid product id');
+    }
+
+    const updateData = this;
+    if (updateData.attributes) {
+      await this.updateBaseProduct({
+        productId,
+        model: ClothingModel,
+        updateData: updateData.attributes,
+      });
+    }
+
+    const updatedProduct = await this.updateBaseProduct({productId, updateData});
+    return updatedProduct
+  }
 }
 
 module.exports = Clothing;

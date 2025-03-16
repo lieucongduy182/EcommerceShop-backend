@@ -1,6 +1,10 @@
 const { BadRequestError } = require('../../../cores/error.response');
 const { ProductModel } = require('../../../models');
 
+const {
+  updateProductByIdRepo,
+} = require('../../../repositories/product/product.repo');
+
 class Product {
   constructor({
     name,
@@ -29,6 +33,14 @@ class Product {
       throw new BadRequestError('Failed to create product');
     }
     return newProduct;
+  }
+
+  async updateBaseProduct({ productId, updateData, model = ProductModel }) {
+    return updateProductByIdRepo({
+      productId,
+      model,
+      updateData,
+    });
   }
 }
 

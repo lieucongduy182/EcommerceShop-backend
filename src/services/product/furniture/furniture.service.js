@@ -1,5 +1,6 @@
 const BaseProduct = require('../base/base');
 const { FurnitureModel } = require('../../../models');
+const { BadRequestError } = require('../../../cores/error.response');
 
 class Furniture extends BaseProduct {
   async create() {

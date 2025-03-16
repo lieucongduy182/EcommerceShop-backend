@@ -8,8 +8,11 @@ router.post('/shop/signUp', asyncHandler(accessController.signUp));
 router.post('/shop/login', asyncHandler(accessController.login));
 
 // middleware for auth
-router.use(authentication)
-router.post('/shop/refreshToken', asyncHandler(accessController.handleRefreshToken));
+router.use(authentication);
+router.post(
+  '/shop/refreshToken',
+  asyncHandler(accessController.handleRefreshToken),
+);
 router.delete('/shop/logout', asyncHandler(accessController.logout));
 
 module.exports = router;
