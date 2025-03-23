@@ -1,8 +1,13 @@
 'use strict';
 
 const _ = require('lodash');
+const { Types } = require('mongoose');
 
 class Utils {
+  convertToObjectId(id) {
+    return new Types.ObjectId(id);
+  }
+
   getInfoData({ fields = [], object = {} }) {
     return _.pick(object, fields);
   }

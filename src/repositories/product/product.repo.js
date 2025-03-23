@@ -66,7 +66,13 @@ const searchProductRepo = async ({ keySearch, limit, skip }) => {
   return searchProduct;
 };
 
-const findAllProductsRepo = async ({ limit, sort, page, filter, select }) => {
+const findAllProductsRepo = async ({
+  limit = 50,
+  sort,
+  page,
+  filter,
+  select,
+}) => {
   const skip = (page - 1) * limit;
   const sortQuery = sort === 'ctime' ? { createdAt: -1 } : { _id: -1 };
   const selectQuery = utils.getSelectData(select);

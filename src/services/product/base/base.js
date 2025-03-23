@@ -1,5 +1,8 @@
 const { BadRequestError } = require('../../../cores/error.response');
 const { ProductModel } = require('../../../models');
+const {
+  insertInventory,
+} = require('../../../repositories/inventory/inventory.repo');
 
 const {
   updateProductByIdRepo,
@@ -32,6 +35,13 @@ class Product {
     if (!newProduct) {
       throw new BadRequestError('Failed to create product');
     }
+
+    await insertInventory({
+      productId: newProduct._id,
+      shopId: newProduct.shop,
+      stock: newProduct.quantity,
+    });
+
     return newProduct;
   }
 

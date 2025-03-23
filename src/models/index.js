@@ -5,6 +5,8 @@ const FurnitureModel = require('./furniture.model');
 const ShopModel = require('./shops.model');
 const ApiKeyModel = require('./apiKey.model');
 const KeyTokenModel = require('./keyToken.model');
+const InventoryModel = require('./inventory.model');
+const DiscountModel = require('./discount.model');
 
 module.exports = {
   ProductModel,
@@ -14,4 +16,6 @@ module.exports = {
   ShopModel,
   ApiKeyModel,
   KeyTokenModel,
+  InventoryModel,
+  DiscountModel,
 };
