@@ -109,6 +109,10 @@ const updateProductByIdRepo = async ({
     .exec();
 };
 
+const findProductByIdRepo = async ({ productId }) => {
+  return ProductModel.findById(productId).lean().exec();
+};
+
 module.exports = {
   findAllDraftsForShopRepo,
   findAllPublishedForShopRepo,
@@ -118,4 +122,5 @@ module.exports = {
   findAllProductsRepo,
   findProductRepo,
   updateProductByIdRepo,
+  findProductByIdRepo,
 };
