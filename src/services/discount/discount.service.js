@@ -123,7 +123,7 @@ class DiscountService {
     return discounts;
   }
 
-  static async getDiscountAmount({ productIds, discountCode, shopId, userId }) {
+  static async getDiscountAmount({ products, discountCode, shopId, userId }) {
     const foundDiscount = await findDiscountCodeActiveRepo({
       discountCode,
       shopId,
@@ -142,22 +142,14 @@ class DiscountService {
 
     // check xem có giá trị order tối thiểu không
     const { minOrderValue } = foundDiscount;
-    const products = await findAllProductsRepo({
-      filter: {
-        _id: { $in: productIds },
-        shop: convertToObjectId(shopId),
-        isPublished: true,
-      },
-      select: ['price'],
-    });
     let totalOrder = 0;
     if (minOrderValue > 0) {
       totalOrder = products.reduce((acc, product) => {
-        return acc + product.price;
+        return acc + product.price * product.quantity;
       }, 0);
 
       if (totalOrder < minOrderValue) {
-        throw new BadRequestError(
+        throw new NotFoundError(
           `Order require minimum value of ${minOrderValue}`,
         );
       }
