@@ -8,10 +8,6 @@ const { getDiscountAmount } = require('./discount/discount.service');
 class CheckoutService {
   static async checkoutReview({ cartId, userId, shopOrderIds }) {
     const foundCart = await findCartByIdRepo(cartId);
-    console.log(
-      '🚀 [Debug] ~ checkout.service.js:11 ~ CheckoutService ~ checkoutReview ~ foundCart:',
-      foundCart,
-    );
 
     if (!foundCart) {
       throw new BadRequestError('Cart does not exist');
@@ -36,10 +32,6 @@ class CheckoutService {
       const checkProductAvailable = await checkProductByServerRepo({
         products: itemProducts,
       });
-      console.log(
-        '🚀 [Debug] ~ checkout.service.js:34 ~ CheckoutService ~ checkoutReview ~ checkProductAvailable:',
-        checkProductAvailable,
-      );
 
       if (!checkProductAvailable[0]) {
         throw new BadRequestError('Something went wrong !');
