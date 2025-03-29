@@ -1,4 +1,5 @@
 const { InventoryModel } = require('../../models');
+const { convertToObjectId } = require('../../utils');
 
 const insertInventory = async ({
   productId,
@@ -7,8 +8,8 @@ const insertInventory = async ({
   location = 'unknown',
 }) => {
   const inventory = await InventoryModel.findOne({
-    productId,
-    shopId,
+    inventoryProductId: convertToObjectId(productId),
+    inventoryShopId: shopId,
   });
 
   if (inventory) {
@@ -17,13 +18,41 @@ const insertInventory = async ({
   }
 
   return InventoryModel.create({
-    productId,
-    shopId,
-    stock,
-    location,
+    inventoryProductId: convertToObjectId(productId),
+    inventoryShopId: shopId,
+    inventoryStock: stock,
+    inventoryLocation: location,
   });
+};
+
+const reservationInventory = async ({ productId, quantity, cartId }) => {
+  const query = {
+    inventoryProductId: convertToObjectId(productId),
+    inventoryStock: { $gte: quantity },
+  };
+
+  const updateSet = {
+    $inc: {
+      inventoryStock: -quantity,
+    },
+    $push: {
+      inventoryReservations: {
+        cartId,
+        quantity,
+        createAt: new Date(),
+      },
+    },
+  };
+
+  const options = {
+    upsert: true,
+    new: true,
+  };
+
+  return InventoryModel.updateOne(query, updateSet, options);
 };
 
 module.exports = {
   insertInventory,
+  reservationInventory,
 };

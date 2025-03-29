@@ -8,6 +8,7 @@ const KeyTokenModel = require('./keyToken.model');
 const InventoryModel = require('./inventory.model');
 const DiscountModel = require('./discount.model');
 const CartModel = require('./cart.model');
+const OrderModel = require('./order.model');
 
 module.exports = {
   ProductModel,
@@ -20,4 +21,5 @@ module.exports = {
   InventoryModel,
   DiscountModel,
   CartModel,
+  OrderModel,
 };

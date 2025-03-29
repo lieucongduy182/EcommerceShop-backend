@@ -5,25 +5,25 @@ const COLLECTION_NAME = 'Inventories';
 
 const inventorySchema = new mongoose.Schema(
   {
-    productId: {
+    inventoryProductId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Product',
     },
-    location: {
+    inventoryLocation: {
       type: String,
       default: 'unknown',
     },
-    stock: {
+    inventoryStock: {
       type: Number,
       required: true,
     },
-    shopId: {
+    inventoryShopId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Shop',
     },
-    reservations: {
+    inventoryReservations: {
       type: Array,
       default: [],
     }
