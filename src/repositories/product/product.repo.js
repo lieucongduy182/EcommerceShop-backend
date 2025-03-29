@@ -113,6 +113,21 @@ const findProductByIdRepo = async ({ productId }) => {
   return ProductModel.findById(productId).lean().exec();
 };
 
+const checkProductByServerRepo = async ({ products }) => {
+  return Promise.all(
+    products.map(async (product) => {
+      const foundProduct = await findProductByIdRepo({ productId: product.productId });
+      if (foundProduct) {
+        return {
+          price: product.price,
+          quantity: product.quantity,
+          productId: product.productId,
+        };
+      }
+    }),
+  );
+};
+
 module.exports = {
   findAllDraftsForShopRepo,
   findAllPublishedForShopRepo,
@@ -123,4 +138,5 @@ module.exports = {
   findProductRepo,
   updateProductByIdRepo,
   findProductByIdRepo,
+  checkProductByServerRepo,
 };
